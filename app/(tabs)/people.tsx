@@ -4,22 +4,24 @@ import PeopleCard from "@/components/PeopleCard";
 import { Octicons } from "@expo/vector-icons";
 import Header from "@/components/Header";
 import { useBridgeService } from "@/services/bridgeService";
+import { useI18n } from "@/utils/i18n";
 
 const People = () => {
   const { resetDemoState } = useBridgeService();
   const [isResetting, setIsResetting] = useState(false);
+  const { t } = useI18n();
 
   const triggerDemoReset = () => {
     Alert.alert(
-      "Reset Demo State",
-      "Restore starting demo setup with queued matches, active chats, and a fresh Bridge deck?",
+      t("bridge_reset_title"),
+      t("bridge_reset_body"),
       [
         {
-          text: "Cancel",
+          text: t("bridge_cancel"),
           style: "cancel",
         },
         {
-          text: "Reset",
+          text: t("bridge_reset"),
           style: "destructive",
           onPress: async () => {
             if (isResetting) {
@@ -51,7 +53,7 @@ const People = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Header headerTitle={"SkillBridge"} button={button} />
+        <Header headerTitle={t("bridge_header")} button={button} />
         <PeopleCard />
       </View>
     </View>

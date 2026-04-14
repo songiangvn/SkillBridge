@@ -7,6 +7,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useI18n } from "@/utils/i18n";
 import {
   FontAwesome,
   Ionicons,
@@ -16,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { t } = useI18n();
 
   return (
     <SafeAreaView
@@ -43,7 +45,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: "Profile",
+            title: t("tab_profile"),
             tabBarIcon: ({ color }) => (
               <FontAwesome name="user" size={24} color={color} />
             ),
@@ -52,7 +54,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="discover"
           options={{
-            title: "Discover",
+            title: t("tab_discover"),
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons
                 name="compass-outline"
@@ -65,7 +67,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="people"
           options={{
-            title: "Bridge",
+            title: t("tab_bridge"),
             tabBarIcon: ({ color }) => (
               <IconSymbol size={28} name="person.3.fill" color={color} />
             ),
@@ -74,7 +76,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="(chats)"
           options={{
-            title: "Q&A",
+            title: t("tab_qa"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="chatbubble" size={24} color={color} />
             ),
@@ -83,7 +85,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Chat",
+            title: t("tab_chat"),
             tabBarIcon: ({ color }) => (
               <Ionicons name="chatbubble-ellipses" size={24} color={color} />
             ),

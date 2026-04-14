@@ -3,6 +3,7 @@ import {
   useAnswerService,
   useQuestionService,
 } from "@/services/questionService";
+import { useI18n } from "@/utils/i18n";
 import { StudyQuestion } from "@/utils/storage";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
@@ -22,6 +23,7 @@ const QuestionCard = ({
   question: StudyQuestion;
   onRemove: () => void;
 }) => {
+  const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [answerDraft, setAnswerDraft] = useState("");
   const { answers, postAnswer, deleteAnswer } = useAnswerService(
@@ -48,11 +50,10 @@ const QuestionCard = ({
       )}
       <View style={styles.questionFooter}>
         <Text style={styles.questionMeta}>
-          {expanded ? answers.length : question.replies} repl
-          {(expanded ? answers.length : question.replies) === 1 ? "y" : "ies"}
+          {expanded ? answers.length : question.replies} {(expanded ? answers.length : question.replies) === 1 ? t("reply") : t("replies")}
         </Text>
         <Pressable onPress={onRemove}>
-          <Text style={styles.removeText}>Remove</Text>
+          <Text style={styles.removeText}>{t("remove")}</Text>
         </Pressable>
       </View>
 
@@ -69,7 +70,7 @@ const QuestionCard = ({
                   })}
                 </Text>
                 <Pressable onPress={() => deleteAnswer(answer.id)}>
-                  <Text style={styles.removeText}>Remove</Text>
+                  <Text style={styles.removeText}>{t("remove")}</Text>
                 </Pressable>
               </View>
             </View>
@@ -78,12 +79,12 @@ const QuestionCard = ({
             style={styles.input}
             value={answerDraft}
             onChangeText={setAnswerDraft}
-            placeholder="Write a helpful answer..."
+            placeholder={t("answer_placeholder")}
             placeholderTextColor="#777"
             multiline
           />
           <Pressable onPress={submitAnswer} style={styles.secondaryButton}>
-            <Text style={styles.secondaryButtonText}>Post answer</Text>
+            <Text style={styles.secondaryButtonText}>{t("post_answer")}</Text>
           </Pressable>
         </View>
       )}
@@ -92,6 +93,7 @@ const QuestionCard = ({
 };
 
 const Chats = () => {
+  const { t } = useI18n();
   const button = () => <AntDesign name="search" size={24} color="black" />;
   const [title, setTitle] = useState("");
   const [tag, setTag] = useState("General");
@@ -113,31 +115,31 @@ const Chats = () => {
   return (
     <ScrollView style={{ paddingHorizontal: 12, backgroundColor: "#fff" }}>
       <View style={{ gap: 14, paddingBottom: 32 }}>
-        <Header headerTitle={"Q&A"} button={button} />
+        <Header headerTitle={t("qa_header")} button={button} />
 
         <View style={styles.askBox}>
-          <Text style={styles.logo}>Ask a question</Text>
+          <Text style={styles.logo}>{t("ask_question")}</Text>
           <TextInput
             style={styles.input}
             value={title}
             onChangeText={setTitle}
-            placeholder="What do you need help with?"
+            placeholder={t("qa_placeholder")}
             placeholderTextColor="#777"
           />
           <TextInput
             style={styles.input}
             value={tag}
             onChangeText={setTag}
-            placeholder="Subject tag"
+            placeholder={t("qa_tag_placeholder")}
             placeholderTextColor="#777"
           />
           <Pressable onPress={addQuestion} style={styles.primaryButton}>
-            <Text style={styles.primaryButtonText}>Post question</Text>
+            <Text style={styles.primaryButtonText}>{t("post_question")}</Text>
           </Pressable>
         </View>
 
         <View style={styles.headerSection}>
-          <Text style={styles.logo}>Recent questions</Text>
+          <Text style={styles.logo}>{t("recent_questions")}</Text>
           <MaterialCommunityIcons name="sort-variant" size={24} color="black" />
         </View>
 

@@ -8,11 +8,13 @@ import { useBridgeService } from "@/services/bridgeService";
 import { useCatalogService } from "@/services/catalogService";
 import { useResourceService } from "@/services/resourceService";
 import { useTutorService } from "@/services/tutorService";
+import { useI18n } from "@/utils/i18n";
 import { EvilIcons } from "@expo/vector-icons";
 
 export default function Discover() {
+  const { t } = useI18n();
   const button = () => <EvilIcons name="question" size={24} color="black" />;
-  const [status, setStatus] = useState("Choose a partner, tutor, or resource.");
+  const [status, setStatus] = useState("");
   const { requestBridge, hasBridgeRequest } = useBridgeService();
   const { shortlistTutor, hasTutor } = useTutorService();
   const { saveResource, hasResource } = useResourceService();
@@ -24,12 +26,12 @@ export default function Discover() {
   ) => {
     if (action === "tutor") {
       shortlistTutor(user);
-      setStatus(`${user.name} added to your tutor shortlist.`);
+      setStatus(`${user.name} ${t("tutor_shortlisted")}`);
       return;
     }
 
     requestBridge(user);
-    setStatus(`Bridge request saved for ${user.name}.`);
+    setStatus(`${t("bridge_request_saved")} ${user.name}.`);
   };
 
   const PartnerSection = ({
@@ -59,7 +61,7 @@ export default function Discover() {
               showLikeIcon={true}
               size="large"
               data={item}
-              actionLabel="Request bridge"
+              actionLabel={t("request_bridge")}
               onAction={() => saveUser(item)}
               selected={hasBridgeRequest(item.id)}
             />
@@ -77,10 +79,10 @@ export default function Discover() {
       <View style={{ gap: 8, paddingVertical: 16 }}>
         <View style={{ gap: 3 }}>
           <Text style={{ fontSize: 20, fontWeight: "900", color: "#111" }}>
-            Tutor marketplace
+            {t("tutor_title")}
           </Text>
           <Text style={{ color: "#555", lineHeight: 20 }}>
-            Paid or skill-swap tutors you can book for focused help.
+            {t("tutor_subtitle")}
           </Text>
         </View>
         <FlatList
@@ -92,7 +94,7 @@ export default function Discover() {
               size="small"
               data={item}
               variant="tutor"
-              actionLabel="Shortlist"
+              actionLabel={t("shortlist")}
               onAction={() => saveUser(item, "tutor")}
               selected={hasTutor(item.id)}
             />
@@ -110,10 +112,10 @@ export default function Discover() {
       <View style={{ gap: 8, paddingVertical: 16, paddingBottom: 100 }}>
         <View style={{ gap: 3 }}>
           <Text style={{ fontSize: 20, fontWeight: "900", color: "#111" }}>
-            Verified resources
+            {t("resource_title")}
           </Text>
           <Text style={{ color: "#555", lineHeight: 20 }}>
-            Starter materials for common goals, synced from Appwrite when configured.
+            {t("resource_subtitle")}
           </Text>
         </View>
         <FlatList
@@ -122,10 +124,10 @@ export default function Discover() {
           renderItem={({ item }) => (
             <ResourceCard
               data={item}
-              actionLabel="Save resource"
+              actionLabel={t("save_resource")}
               onAction={() => {
                 saveResource(item);
-                setStatus(`${item.title} saved to your library.`);
+                setStatus(`${item.title} ${t("resource_saved")}`);
               }}
               selected={hasResource(item.id)}
             />
@@ -140,7 +142,7 @@ export default function Discover() {
 
   return (
     <ScrollView style={{ paddingHorizontal: 12, backgroundColor: "#fff" }}>
-      <Header headerTitle={"Discover"} button={button} />
+      <Header headerTitle={t("discover_header")} button={button} />
       <View
         style={{
           backgroundColor: "#FFD600",
@@ -152,22 +154,22 @@ export default function Discover() {
         }}
       >
         <Text style={{ fontWeight: "900", fontSize: 16 }}>
-          SkillBridge MVP
+          {t("discover_mvp_title")}
         </Text>
         <Text style={{ color: "#333", lineHeight: 20 }}>
-          Find a learning partner, book a tutor, or save a verified resource.
+          {t("discover_mvp_body")}
         </Text>
-        <Text style={{ color: "#111", fontWeight: "800" }}>{status}</Text>
+        <Text style={{ color: "#111", fontWeight: "800" }}>{status || t("discover_status_default")}</Text>
       </View>
 
       <PartnerSection
-        title="Learning partners for you"
-        subtitle="People whose strengths and goals complement your own."
+        title={t("partners_title")}
+        subtitle={t("partners_subtitle")}
         data={recommendations}
       />
       <PartnerSection
-        title="Same learning goal"
-        subtitle="Learners working toward similar outcomes this week."
+        title={t("same_goal_title")}
+        subtitle={t("same_goal_subtitle")}
         data={sameGoal}
         backgroundColor="#f7f7f7"
       />

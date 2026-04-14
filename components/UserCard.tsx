@@ -1,4 +1,5 @@
 import { LearningResource, SkillBridgeUser } from "@/DB/userDB";
+import { useI18n } from "@/utils/i18n";
 import { EvilIcons, FontAwesome } from "@expo/vector-icons";
 import * as WebBrowser from "expo-web-browser";
 import { ImageBackground, Pressable, Text, View } from "react-native";
@@ -21,6 +22,7 @@ const UserCard = ({
   onAction,
   selected = false,
 }: UserCardProp) => {
+  const { t } = useI18n();
   const isLarge = size === "large";
 
   return (
@@ -104,7 +106,7 @@ const UserCard = ({
               fontWeight: "900",
             }}
           >
-            {selected ? "Saved" : actionLabel}
+            {selected ? t("saved") : actionLabel}
           </Text>
         </Pressable>
       )}
@@ -123,6 +125,7 @@ export const ResourceCard = ({
   onAction?: () => void;
   selected?: boolean;
 }) => {
+  const { t } = useI18n();
   const openResource = async () => {
     console.log("Open resource:", data.title, "url:", data.url);
     if (data.url) {
@@ -185,7 +188,7 @@ export const ResourceCard = ({
             alignItems: "center",
           }}
         >
-          <Text style={{ color: "#111", fontWeight: "900" }}>Open</Text>
+          <Text style={{ color: "#111", fontWeight: "900" }}>{t("open")}</Text>
         </Pressable>
         {actionLabel && (
           <Pressable
@@ -199,7 +202,7 @@ export const ResourceCard = ({
             }}
           >
             <Text style={{ color: selected ? "#111" : "#fff", fontWeight: "900" }}>
-              {selected ? "Saved" : actionLabel}
+              {selected ? t("saved") : actionLabel}
             </Text>
           </Pressable>
         )}

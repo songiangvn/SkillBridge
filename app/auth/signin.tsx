@@ -1,4 +1,5 @@
 import { signIn } from "@/services/authService";
+import { useI18n } from "@/utils/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -15,6 +16,7 @@ import {
 } from "react-native";
 
 const SigninScreen = () => {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,12 +26,12 @@ const SigninScreen = () => {
     setLoading(true);
     try {
       const result = await signIn({ email, password });
-      Alert.alert("Success", result.message);
+      Alert.alert(t("success"), result.message);
       setEmail("");
       setPassword("");
       router.replace("/profile");
     } catch (error: any) {
-      Alert.alert("Sign In Error", error.message || "Unknown error");
+      Alert.alert(t("signin_error"), error.message || "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -45,17 +47,17 @@ const SigninScreen = () => {
           <View style={styles.brandMark}>
             <Ionicons name="school" size={40} color="#111" />
           </View>
-          <Text style={styles.title}>Continue Learning</Text>
+          <Text style={styles.title}>{t("continue_learning")}</Text>
           <Text style={styles.subtitle}>
-            Sign in to keep matches, tutors, and questions in sync.
+            {t("signin_subtitle")}
           </Text>
 
           <View style={styles.form}>
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t("email")}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder={t("email_placeholder")}
                 placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
@@ -66,12 +68,12 @@ const SigninScreen = () => {
 
             <View style={styles.fieldGroup}>
               <View style={styles.labelRow}>
-                <Text style={styles.label}>Password</Text>
-                <Text style={styles.linkSmall}>Forgot?</Text>
+                <Text style={styles.label}>{t("password")}</Text>
+                <Text style={styles.linkSmall}>{t("forgot")}</Text>
               </View>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your password"
+                placeholder={t("password_placeholder")}
                 placeholderTextColor="#aaa"
                 value={password}
                 onChangeText={setPassword}
@@ -85,7 +87,7 @@ const SigninScreen = () => {
               disabled={loading}
             >
               <Text style={styles.primaryButtonText}>
-                {loading ? "Signing in..." : "Login"}
+                {loading ? t("signing_in") : t("login")}
               </Text>
             </Pressable>
 
@@ -94,7 +96,7 @@ const SigninScreen = () => {
               style={styles.switchLink}
             >
               <Text style={styles.switchText}>
-                New to SkillBridge? <Text style={styles.switchTextStrong}>Sign Up</Text>
+                {t("new_to_sb")} <Text style={styles.switchTextStrong}>{t("sign_up")}</Text>
               </Text>
             </Pressable>
           </View>

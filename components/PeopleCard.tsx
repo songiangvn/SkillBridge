@@ -1,6 +1,7 @@
 import { SkillBridgeUser } from "@/DB/userDB";
 import { useBridgeService } from "@/services/bridgeService";
 import { useCatalogService } from "@/services/catalogService";
+import { useI18n } from "@/utils/i18n";
 import { ProfileDraft, STORAGE_KEYS, readStored } from "@/utils/storage";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { AntDesign, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -37,6 +38,7 @@ const overlapRatio = (source: string[], target: string[]) => {
 const clampScore = (score: number) => Math.min(5, Math.max(3.1, score));
 
 const PeopleCard = () => {
+  const { t } = useI18n();
   const { width, height } = useWindowDimensions();
   const tabBarHeight = useBottomTabBarHeight();
   const deckWidth = Math.min(width - 32, 390);
@@ -55,9 +57,7 @@ const PeopleCard = () => {
   const [matchNotice, setMatchNotice] = useState<string | null>(null);
   const { requestBridge, skipProfile } = useBridgeService();
   const { partners } = useCatalogService();
-  const [lastAction, setLastAction] = useState(
-    "Swipe right for a match or left to pass."
-  );
+  const [lastAction, setLastAction] = useState("");
   const profileDraft = readStored<ProfileDraft | null>(STORAGE_KEYS.profile, null);
   const myCanTeach = useMemo(
     () =>
@@ -104,8 +104,8 @@ const PeopleCard = () => {
     if (action === "bridged") {
       requestBridge(user).then((result) => {
         if (result.matched) {
-          setLastAction(`Matched with ${user.name}. Open Chat to message.`);
-          setMatchNotice(`It's a match with ${user.name}`);
+          setLastAction(`${t("matched_with")} ${user.name}. ${t("open_chat_to_message")}`);
+          setMatchNotice(`${t("matched_with")} ${user.name}`);
           if (matchToastTimeoutRef.current) {
             clearTimeout(matchToastTimeoutRef.current);
           }
@@ -115,15 +115,15 @@ const PeopleCard = () => {
           return;
         }
 
-        setLastAction(`Waiting for a mutual match with ${user.name}.`);
+        setLastAction(`${t("waiting_mutual")} ${user.name}.`);
       }).catch(() => {
-        setLastAction(`Waiting for a mutual match with ${user.name}.`);
+        setLastAction(`${t("waiting_mutual")} ${user.name}.`);
       });
       return;
     }
 
     skipProfile(user);
-    setLastAction(`${user.name} skipped.`);
+    setLastAction(`${user.name} ${t("skipped")}`);
   };
 
   useEffect(
@@ -170,8 +170,8 @@ const PeopleCard = () => {
     if (!card) {
       return (
         <View style={[styles.card, styles.emptyCard, { width: deckWidth, height: deckHeight }]}>
-          <Text style={styles.emptyTitle}>No more matches</Text>
-          <Text style={styles.emptyText}>Check Discover or update your learning profile.</Text>
+          <Text style={styles.emptyTitle}>{t("no_more_matches")}</Text>
+          <Text style={styles.emptyText}>{t("no_more_matches_hint")}</Text>
         </View>
       );
     }
@@ -226,13 +226,13 @@ const PeopleCard = () => {
 
             <View style={styles.skillRow}>
               <View style={styles.skillBlock}>
-                <Text style={styles.label}>Can teach</Text>
+                <Text style={styles.label}>{t("can_teach")}</Text>
                 <Text style={styles.value} numberOfLines={1}>
                   {card.canTeach.join(" / ")}
                 </Text>
               </View>
               <View style={styles.skillBlock}>
-                <Text style={styles.label}>Wants</Text>
+                <Text style={styles.label}>{t("wants")}</Text>
                 <Text style={styles.value} numberOfLines={1}>
                   {card.wantsToLearn.join(" / ")}
                 </Text>
@@ -248,9 +248,9 @@ const PeopleCard = () => {
     <View style={styles.container}>
       <View style={[styles.statusCard, { width: deckWidth }]}>
         <Text style={styles.statusTitle}>
-          {Math.max(rotatedPartners.length - currentIndex, 0)} profiles left
+          {Math.max(rotatedPartners.length - currentIndex, 0)} {t("profiles_left")}
         </Text>
-        <Text style={styles.statusText}>{lastAction}</Text>
+        <Text style={styles.statusText}>{lastAction || t("swipe_hint")}</Text>
       </View>
 
       {matchNotice && (
@@ -283,14 +283,14 @@ const PeopleCard = () => {
           onSwipedAll={() => {
             setDeckCycle((previous) => previous + 1);
             setCurrentIndex(0);
-            setLastAction("Suggestions refreshed. Previously skipped profiles can reappear.");
+            setLastAction(t("suggestions_refreshed"));
           }}
           overlayLabels={{
             left: {
               title: (
                 <View style={[styles.overlayBadge, styles.passBadge]}>
                   <AntDesign name="close" size={42} color="#f44336" />
-                  <Text style={[styles.overlayText, styles.passText]}>SKIP</Text>
+                  <Text style={[styles.overlayText, styles.passText]}>{t("overlay_skip")}</Text>
                 </View>
               ),
               style: {
@@ -305,7 +305,7 @@ const PeopleCard = () => {
                 <View style={[styles.overlayBadge, styles.bridgeBadge]}>
                   <AntDesign name="check" size={44} color="#34a853" />
                   <Text style={[styles.overlayText, styles.bridgeOverlayText]}>
-                    BRIDGE
+                    {t("overlay_bridge")}
                   </Text>
                 </View>
               ),
@@ -351,14 +351,14 @@ const PeopleCard = () => {
             <Text style={styles.modalTitle}>{selectedUser?.name}</Text>
             <Text style={styles.modalSubtitle}>{selectedUser?.headline}</Text>
             <View style={styles.modalDivider} />
-            <Text style={styles.modalLabel}>Goal</Text>
+            <Text style={styles.modalLabel}>{t("goal")}</Text>
             <Text style={styles.modalBody}>{selectedUser?.goal}</Text>
-            <Text style={styles.modalLabel}>Can teach</Text>
+            <Text style={styles.modalLabel}>{t("can_teach")}</Text>
             <Text style={styles.modalBody}>{selectedUser?.canTeach.join(", ")}</Text>
-            <Text style={styles.modalLabel}>Wants to learn</Text>
+            <Text style={styles.modalLabel}>{t("wants_to_learn")}</Text>
             <Text style={styles.modalBody}>{selectedUser?.wantsToLearn.join(", ")}</Text>
             <Pressable style={styles.modalCloseButton} onPress={() => setSelectedUser(null)}>
-              <Text style={styles.modalCloseText}>Close</Text>
+              <Text style={styles.modalCloseText}>{t("close")}</Text>
             </Pressable>
           </View>
         </View>

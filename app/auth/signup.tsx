@@ -1,4 +1,5 @@
 import { signUp } from "@/services/authService";
+import { useI18n } from "@/utils/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -15,6 +16,7 @@ import {
 } from "react-native";
 
 const SignupScreen = () => {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -25,13 +27,13 @@ const SignupScreen = () => {
     setLoading(true);
     try {
       const result = await signUp({ name, email, password });
-      Alert.alert("Success", result.message);
+      Alert.alert(t("success"), result.message);
       setEmail("");
       setPassword("");
       setName("");
       router.replace("/profile");
     } catch (error: any) {
-      Alert.alert("Signup Error", error.message || "Unknown error");
+      Alert.alert(t("signup_error"), error.message || "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -47,17 +49,17 @@ const SignupScreen = () => {
           <View style={styles.brandMark}>
             <Ionicons name="school" size={40} color="#111" />
           </View>
-          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.title}>{t("create_account")}</Text>
           <Text style={styles.subtitle}>
-            Build a learning profile for skill swaps, tutors, and Q&A.
+            {t("signup_subtitle")}
           </Text>
 
           <View style={styles.form}>
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Name</Text>
+              <Text style={styles.label}>{t("name")}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your name"
+                placeholder={t("name_placeholder")}
                 placeholderTextColor="#aaa"
                 value={name}
                 onChangeText={setName}
@@ -66,10 +68,10 @@ const SignupScreen = () => {
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t("email")}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder={t("email_placeholder")}
                 placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
@@ -79,10 +81,10 @@ const SignupScreen = () => {
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>{t("password")}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your password"
+                placeholder={t("password_placeholder")}
                 placeholderTextColor="#aaa"
                 value={password}
                 onChangeText={setPassword}
@@ -96,7 +98,7 @@ const SignupScreen = () => {
               disabled={loading}
             >
               <Text style={styles.primaryButtonText}>
-                {loading ? "Creating account..." : "Sign Up"}
+                {loading ? t("creating_account") : t("sign_up")}
               </Text>
             </Pressable>
 
@@ -105,7 +107,7 @@ const SignupScreen = () => {
               style={styles.switchLink}
             >
               <Text style={styles.switchText}>
-                Already learning here? <Text style={styles.switchTextStrong}>Login</Text>
+                {t("already_here")} <Text style={styles.switchTextStrong}>{t("login")}</Text>
               </Text>
             </Pressable>
           </View>

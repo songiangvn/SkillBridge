@@ -4,6 +4,7 @@ import {
   SkillBridgeMatch,
   useMatchService,
 } from "@/services/matchService";
+import { useI18n } from "@/utils/i18n";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -45,6 +46,7 @@ const formatClock = (isoTime: string) =>
   });
 
 const Chat = () => {
+  const { t } = useI18n();
   const router = useRouter();
   const button = () => <Ionicons name="search" size={24} color="#111" />;
   const { threads, matches } = useMatchService();
@@ -147,20 +149,19 @@ const Chat = () => {
   return (
     <ScrollView style={styles.screen}>
       <View style={styles.content}>
-        <Header headerTitle="Chat" button={button} />
+        <Header headerTitle={t("chat_header")} button={button} />
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Match queue</Text>
+          <Text style={styles.sectionTitle}>{t("match_queue")}</Text>
           <Text style={styles.sectionSubtitle}>
-            Mutual matches waiting for the first message. Each one expires in
-            24 hours.
+            {t("match_queue_hint")}
           </Text>
 
           {matchQueue.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyTitle}>No queued matches</Text>
+              <Text style={styles.emptyTitle}>{t("no_queued")}</Text>
               <Text style={styles.emptyText}>
-                Swipe right in Bridge. New mutual matches will appear here.
+                {t("no_queued_hint")}
               </Text>
             </View>
           ) : (
@@ -187,7 +188,7 @@ const Chat = () => {
                   <Text style={styles.queueName} numberOfLines={1}>
                     {item.match.targetName}
                   </Text>
-                  <Text style={styles.queueMeta}>Tap to start</Text>
+                  <Text style={styles.queueMeta}>{t("tap_to_start")}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -195,16 +196,16 @@ const Chat = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Conversations</Text>
+          <Text style={styles.sectionTitle}>{t("conversations")}</Text>
           <Text style={styles.sectionSubtitle}>
-            Chats where at least one message has been sent.
+            {t("conversations_hint")}
           </Text>
 
           {conversations.length === 0 ? (
             <View style={styles.emptyCard}>
-              <Text style={styles.emptyTitle}>No conversations yet</Text>
+              <Text style={styles.emptyTitle}>{t("no_conversations")}</Text>
               <Text style={styles.emptyText}>
-                Start a message from your match queue to move it here.
+                {t("no_conversations_hint")}
               </Text>
             </View>
           ) : (

@@ -14,6 +14,7 @@ import Button from "@/components/Button";
 import { useRouter } from "expo-router";
 import { ProfileDraft, useProfileService } from "@/services/profileService";
 import { signOut } from "@/services/authService";
+import { useI18n } from "@/utils/i18n";
 
 const Profile = () => {
   const headerbutton = () => (
@@ -22,34 +23,69 @@ const Profile = () => {
   const router = useRouter();
   const { profile, profileStrength, updateProfile } = useProfileService();
   const [isSigningOut, setIsSigningOut] = React.useState(false);
+  const { t, lang, setLang } = useI18n();
 
   const profileSteps = [
-    { label: "Choose learner/tutor role", done: Boolean(profile.role.trim()) },
-    { label: "Add skills you can teach", done: Boolean(profile.canTeach.trim()) },
+    { label: t("step_role"), done: Boolean(profile.role.trim()) },
+    { label: t("step_teach"), done: Boolean(profile.canTeach.trim()) },
     {
-      label: "Add skills you want to learn",
+      label: t("step_learn"),
       done: Boolean(profile.wantsToLearn.trim()),
     },
     {
-      label: "Set weekly availability",
+      label: t("step_availability"),
       done: Boolean(profile.availability.trim()),
     },
-    { label: "Choose learning mode", done: Boolean(profile.mode.trim()) },
-    { label: "Set current level", done: Boolean(profile.level.trim()) },
-    { label: "Write a learning goal", done: Boolean(profile.goal.trim()) },
+    { label: t("step_mode"), done: Boolean(profile.mode.trim()) },
+    { label: t("step_level"), done: Boolean(profile.level.trim()) },
+    { label: t("step_goal"), done: Boolean(profile.goal.trim()) },
   ];
   const roleOptions: ProfileDraft["role"][] = ["Learner", "Tutor", "Both"];
+  const roleLabels: Record<string, string> = {
+    Learner: t("role_learner"),
+    Tutor: t("role_tutor"),
+    Both: t("role_both"),
+  };
   const modeOptions: ProfileDraft["mode"][] = ["Online", "In person", "Hybrid"];
+  const modeLabels: Record<string, string> = {
+    Online: t("mode_online"),
+    "In person": t("mode_inperson"),
+    Hybrid: t("mode_hybrid"),
+  };
   const levelOptions: ProfileDraft["level"][] = [
     "Beginner",
     "Intermediate",
     "Advanced",
   ];
+  const levelLabels: Record<string, string> = {
+    Beginner: t("level_beginner"),
+    Intermediate: t("level_intermediate"),
+    Advanced: t("level_advanced"),
+  };
 
   return (
     <ScrollView style={{ paddingHorizontal: 12, backgroundColor: "#fff" }}>
       <View style={{ gap: 16, paddingBottom: 32 }}>
-        <Header headerTitle={"Profile"} button={headerbutton} />
+        <Header headerTitle={t("profile_header")} button={headerbutton} />
+
+        <View style={styles.langRow}>
+          <Text style={styles.langLabel}>{t("language")}</Text>
+          <View style={styles.langToggle}>
+            <Pressable
+              onPress={() => setLang("en")}
+              style={[styles.langChip, lang === "en" && styles.langChipActive]}
+            >
+              <Text style={[styles.langText, lang === "en" && styles.langTextActive]}>EN</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setLang("vi")}
+              style={[styles.langChip, lang === "vi" && styles.langChipActive]}
+            >
+              <Text style={[styles.langText, lang === "vi" && styles.langTextActive]}>VI</Text>
+            </Pressable>
+          </View>
+        </View>
+
         <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
           <Avatar
             size={82}
@@ -57,10 +93,10 @@ const Profile = () => {
           />
           <View style={{ flex: 1, gap: 6 }}>
             <Text style={{ fontSize: 24, fontWeight: "900", color: "#111" }}>
-              {profile.name || "SkillBridge Learner"}
+              {profile.name || t("profile_default_name")}
             </Text>
             <Text style={{ color: "#555", lineHeight: 20 }}>
-              {profile.goal || "Add a learning goal to improve matches."}
+              {profile.goal || t("profile_default_goal")}
             </Text>
             <View style={{ flexDirection: "row", gap: 8 }}>
               <Button
@@ -71,7 +107,7 @@ const Profile = () => {
                 paddingVertical={9}
                 onPress={() => router.replace("/auth/signin")}
               >
-                Switch account
+                {t("switch_account")}
               </Button>
               <Button
                 style={{ backgroundColor: "#e5e5e5", alignSelf: "flex-start" }}
@@ -87,31 +123,30 @@ const Profile = () => {
                   router.replace("/auth/signin");
                 }}
               >
-                {isSigningOut ? "Signing out..." : "Sign out"}
+                {isSigningOut ? t("signing_out") : t("sign_out")}
               </Button>
             </View>
           </View>
         </View>
 
         <View style={styles.heroCard}>
-          <Text style={styles.heroTitle}>Learning profile strength</Text>
+          <Text style={styles.heroTitle}>{t("profile_strength")}</Text>
           <Text style={styles.heroScore}>{profileStrength}%</Text>
           <Text style={styles.heroText}>
-            Complete your skills, availability, and goal to improve match
-            quality.
+            {t("profile_strength_hint")}
           </Text>
         </View>
 
         <View style={styles.formCard}>
-          <Text style={styles.sectionTitle}>Edit learning profile</Text>
+          <Text style={styles.sectionTitle}>{t("edit_profile")}</Text>
           <TextInput
             style={styles.input}
             value={profile.name}
             onChangeText={(value) => updateProfile("name", value)}
-            placeholder="Display name"
+            placeholder={t("placeholder_name")}
             placeholderTextColor="#777"
           />
-          <Text style={styles.fieldLabel}>Role</Text>
+          <Text style={styles.fieldLabel}>{t("field_role")}</Text>
           <View style={styles.choiceRow}>
             {roleOptions.map((role) => (
               <Pressable
@@ -128,7 +163,7 @@ const Profile = () => {
                     profile.role === role && styles.choiceTextActive,
                   ]}
                 >
-                  {role}
+                  {roleLabels[role] || role}
                 </Text>
               </Pressable>
             ))}
@@ -137,24 +172,24 @@ const Profile = () => {
             style={styles.input}
             value={profile.canTeach}
             onChangeText={(value) => updateProfile("canTeach", value)}
-            placeholder="Skills you can teach"
+            placeholder={t("placeholder_teach")}
             placeholderTextColor="#777"
           />
           <TextInput
             style={styles.input}
             value={profile.wantsToLearn}
             onChangeText={(value) => updateProfile("wantsToLearn", value)}
-            placeholder="Skills you want to learn"
+            placeholder={t("placeholder_learn")}
             placeholderTextColor="#777"
           />
           <TextInput
             style={styles.input}
             value={profile.availability}
             onChangeText={(value) => updateProfile("availability", value)}
-            placeholder="Weekly availability"
+            placeholder={t("placeholder_availability")}
             placeholderTextColor="#777"
           />
-          <Text style={styles.fieldLabel}>Learning mode</Text>
+          <Text style={styles.fieldLabel}>{t("field_mode")}</Text>
           <View style={styles.choiceRow}>
             {modeOptions.map((mode) => (
               <Pressable
@@ -171,12 +206,12 @@ const Profile = () => {
                     profile.mode === mode && styles.choiceTextActive,
                   ]}
                 >
-                  {mode}
+                  {modeLabels[mode] || mode}
                 </Text>
               </Pressable>
             ))}
           </View>
-          <Text style={styles.fieldLabel}>Current level</Text>
+          <Text style={styles.fieldLabel}>{t("field_level")}</Text>
           <View style={styles.choiceRow}>
             {levelOptions.map((level) => (
               <Pressable
@@ -193,7 +228,7 @@ const Profile = () => {
                     profile.level === level && styles.choiceTextActive,
                   ]}
                 >
-                  {level}
+                  {levelLabels[level] || level}
                 </Text>
               </Pressable>
             ))}
@@ -202,28 +237,28 @@ const Profile = () => {
             style={styles.input}
             value={profile.location}
             onChangeText={(value) => updateProfile("location", value)}
-            placeholder="Location or timezone"
+            placeholder={t("placeholder_location")}
             placeholderTextColor="#777"
           />
           <TextInput
             style={styles.input}
             value={profile.credentials}
             onChangeText={(value) => updateProfile("credentials", value)}
-            placeholder="Credentials, proof, or teaching experience"
+            placeholder={t("placeholder_credentials")}
             placeholderTextColor="#777"
           />
           <TextInput
             style={styles.input}
             value={profile.hourlyRate}
             onChangeText={(value) => updateProfile("hourlyRate", value)}
-            placeholder="Tutor hourly rate (optional)"
+            placeholder={t("placeholder_rate")}
             placeholderTextColor="#777"
           />
           <TextInput
             style={[styles.input, styles.goalInput]}
             value={profile.goal}
             onChangeText={(value) => updateProfile("goal", value)}
-            placeholder="Learning goal"
+            placeholder={t("placeholder_goal")}
             placeholderTextColor="#777"
             multiline
           />
@@ -231,37 +266,37 @@ const Profile = () => {
 
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Role</Text>
-            <Text style={styles.statValue}>{profile.role}</Text>
+            <Text style={styles.statLabel}>{t("field_role")}</Text>
+            <Text style={styles.statValue}>{roleLabels[profile.role] || profile.role}</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Can teach</Text>
+            <Text style={styles.statLabel}>{t("stat_can_teach")}</Text>
             <Text style={styles.statValue}>
-              {profile.canTeach || "Add a skill"}
+              {profile.canTeach || t("stat_add_skill")}
             </Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Learning</Text>
+            <Text style={styles.statLabel}>{t("stat_learning")}</Text>
             <Text style={styles.statValue}>
-              {profile.wantsToLearn || "Add a goal skill"}
+              {profile.wantsToLearn || t("stat_add_goal_skill")}
             </Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Availability</Text>
+            <Text style={styles.statLabel}>{t("stat_availability")}</Text>
             <Text style={styles.statValue}>
-              {profile.availability || "Not set yet"}
+              {profile.availability || t("stat_not_set")}
             </Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Mode / level</Text>
+            <Text style={styles.statLabel}>{t("stat_mode_level")}</Text>
             <Text style={styles.statValue}>
-              {profile.mode} | {profile.level}
+              {modeLabels[profile.mode] || profile.mode} | {levelLabels[profile.level] || profile.level}
             </Text>
           </View>
         </View>
 
         <View style={styles.table}>
-          <Text style={styles.sectionTitle}>MVP checklist</Text>
+          <Text style={styles.sectionTitle}>{t("mvp_checklist")}</Text>
           {profileSteps.map((step) => {
             return (
               <View style={styles.tableItem} key={step.label}>
@@ -393,5 +428,36 @@ const styles = StyleSheet.create({
   table: {
     width: "100%",
     gap: 10,
+  },
+  langRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  langLabel: {
+    color: "#111",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  langToggle: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  langChip: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  langChipActive: {
+    backgroundColor: "#111",
+  },
+  langText: {
+    color: "#333",
+    fontWeight: "800",
+    fontSize: 13,
+  },
+  langTextActive: {
+    color: "#fff",
   },
 });

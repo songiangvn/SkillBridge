@@ -1,5 +1,6 @@
 import { appwriteAdapter } from "@/services/appwriteAdapter";
 import { useMatchService, useThreadMessages } from "@/services/matchService";
+import { useI18n } from "@/utils/i18n";
 import { ChatThread, upsertById } from "@/utils/storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -18,6 +19,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const ChatScreen = () => {
+  const { t } = useI18n();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
@@ -167,11 +169,11 @@ const ChatScreen = () => {
       <View style={styles.emptyContainer}>
         <Pressable onPress={navigateToChatTab} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#111" />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>{t("back")}</Text>
         </Pressable>
-        <Text style={styles.title}>Opening chat...</Text>
+        <Text style={styles.title}>{t("opening_chat")}</Text>
         <Text style={styles.body}>
-          Syncing thread data so you can start messaging.
+          {t("opening_chat_hint")}
         </Text>
       </View>
     );
@@ -182,12 +184,11 @@ const ChatScreen = () => {
       <View style={styles.emptyContainer}>
         <Pressable onPress={navigateToChatTab} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#111" />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>{t("back")}</Text>
         </Pressable>
-        <Text style={styles.title}>No match thread yet</Text>
+        <Text style={styles.title}>{t("no_thread")}</Text>
         <Text style={styles.body}>
-          Swipe right on Bridge, wait for a mutual bridge, then open Match
-          queue from Chat.
+          {t("no_thread_hint")}
         </Text>
       </View>
     );
@@ -207,7 +208,7 @@ const ChatScreen = () => {
         <View style={styles.headerCopy}>
           <Text style={styles.title}>{activeThread.targetName}</Text>
           <Text style={styles.subtitle} numberOfLines={1}>
-            {activeThread.targetHeadline || "Learning match"}
+            {activeThread.targetHeadline || t("learning_match")}
           </Text>
         </View>
       </View>
@@ -218,10 +219,9 @@ const ChatScreen = () => {
       >
         {messages.length === 0 && (
           <View style={styles.starterCard}>
-            <Text style={styles.starterTitle}>What a bridge!</Text>
+            <Text style={styles.starterTitle}>{t("what_a_bridge")}</Text>
             <Text style={styles.starterText}>
-              Start with one specific learning goal and propose a first session
-              time.
+              {t("starter_hint")}
             </Text>
           </View>
         )}
@@ -252,7 +252,7 @@ const ChatScreen = () => {
         {isPeerTyping && (
           <View style={[styles.messageBubble, styles.theirBubble, styles.typingBubble]}>
             <Text style={styles.messageText}>
-              {activeThread.targetName} is typing{".".repeat(typingFrame)}
+              {activeThread.targetName} {t("is_typing")}{".".repeat(typingFrame)}
             </Text>
           </View>
         )}
@@ -263,7 +263,7 @@ const ChatScreen = () => {
           style={styles.input}
           value={draft}
           onChangeText={setDraft}
-          placeholder="Send a message..."
+          placeholder={t("send_placeholder")}
           placeholderTextColor="#777"
           multiline
         />
