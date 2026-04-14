@@ -312,6 +312,7 @@ const mapResource = (
   level: String(document.level || "Beginner"),
   verifiedBy: String(document.verifiedBy || "SkillBridge"),
   image: String(document.image || fallbackAvatar),
+  url: String(document.url || ""),
 });
 
 const createPairKey = (firstUserId: string, secondUserId: string) =>

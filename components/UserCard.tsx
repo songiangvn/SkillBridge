@@ -1,5 +1,6 @@
 import { LearningResource, SkillBridgeUser } from "@/DB/userDB";
 import { EvilIcons, FontAwesome } from "@expo/vector-icons";
+import * as WebBrowser from "expo-web-browser";
 import { ImageBackground, Pressable, Text, View } from "react-native";
 
 interface UserCardProp {
@@ -122,6 +123,17 @@ export const ResourceCard = ({
   onAction?: () => void;
   selected?: boolean;
 }) => {
+  const openResource = async () => {
+    console.log("Open resource:", data.title, "url:", data.url);
+    if (data.url) {
+      try {
+        await WebBrowser.openBrowserAsync(data.url);
+      } catch (e) {
+        console.log("WebBrowser error:", e);
+      }
+    }
+  };
+
   return (
     <View
       style={{
@@ -133,46 +145,65 @@ export const ResourceCard = ({
         elevation: 2,
       }}
     >
-      <ImageBackground
-        source={{ uri: data.image }}
-        style={{
-          height: 130,
-          borderRadius: 8,
-          overflow: "hidden",
-          justifyContent: "flex-end",
-        }}
-      >
-        <View
+      <Pressable onPress={openResource}>
+        <ImageBackground
+          source={{ uri: data.image }}
           style={{
-            backgroundColor: "rgba(0,0,0,0.55)",
-            paddingHorizontal: 10,
-            paddingVertical: 8,
+            height: 130,
+            borderRadius: 8,
+            overflow: "hidden",
+            justifyContent: "flex-end",
           }}
         >
-          <Text style={{ color: "#fff", fontWeight: "900" }}>
-            {data.subject}
-          </Text>
-        </View>
-      </ImageBackground>
-      <Text style={{ fontSize: 16, fontWeight: "900" }}>{data.title}</Text>
+          <View
+            style={{
+              backgroundColor: "rgba(0,0,0,0.55)",
+              paddingHorizontal: 10,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ color: "#fff", fontWeight: "900" }}>
+              {data.subject}
+            </Text>
+          </View>
+        </ImageBackground>
+      </Pressable>
+      <Pressable onPress={openResource}>
+        <Text style={{ fontSize: 16, fontWeight: "900" }}>{data.title}</Text>
+      </Pressable>
       <Text style={{ color: "#555" }}>
         {data.level} | {data.verifiedBy}
       </Text>
-      {actionLabel && (
+      <View style={{ flexDirection: "row", gap: 8 }}>
         <Pressable
-          onPress={onAction}
+          onPress={openResource}
           style={{
-            backgroundColor: selected ? "#f0f0f0" : "#111",
+            flex: 1,
+            backgroundColor: "#FFD600",
             borderRadius: 8,
             paddingVertical: 10,
             alignItems: "center",
           }}
         >
-          <Text style={{ color: selected ? "#111" : "#fff", fontWeight: "900" }}>
-            {selected ? "Saved" : actionLabel}
-          </Text>
+          <Text style={{ color: "#111", fontWeight: "900" }}>Open</Text>
         </Pressable>
-      )}
+        {actionLabel && (
+          <Pressable
+            onPress={onAction}
+            style={{
+              flex: 1,
+              backgroundColor: selected ? "#f0f0f0" : "#111",
+              borderRadius: 8,
+              paddingVertical: 10,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: selected ? "#111" : "#fff", fontWeight: "900" }}>
+              {selected ? "Saved" : actionLabel}
+            </Text>
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 };

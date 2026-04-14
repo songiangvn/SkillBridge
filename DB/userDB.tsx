@@ -20,6 +20,7 @@ export type LearningResource = {
   level: string;
   verifiedBy: string;
   image: string;
+  url: string;
 };
 
 const SuggestedUsers: SkillBridgeUser[] = [
@@ -472,6 +473,7 @@ const LEARNING_RESOURCES: LearningResource[] = [
     verifiedBy: "SkillBridge mentors",
     image:
       "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop",
+    url: "https://reactnative.dev/docs/getting-started",
   },
   {
     id: "resource-2",
@@ -481,6 +483,7 @@ const LEARNING_RESOURCES: LearningResource[] = [
     verifiedBy: "Community tutors",
     image:
       "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=2073&auto=format&fit=crop",
+    url: "https://www.bbc.co.uk/learningenglish/english/course/lower-intermediate",
   },
   {
     id: "resource-3",
@@ -490,6 +493,7 @@ const LEARNING_RESOURCES: LearningResource[] = [
     verifiedBy: "Tutor review",
     image:
       "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?q=80&w=2074&auto=format&fit=crop",
+    url: "https://www.khanacademy.org/math/algebra",
   },
   {
     id: "resource-4",
@@ -499,6 +503,7 @@ const LEARNING_RESOURCES: LearningResource[] = [
     verifiedBy: "SkillBridge data mentors",
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
+    url: "https://www.w3schools.com/sql/default.asp",
   },
   {
     id: "resource-5",
@@ -508,6 +513,7 @@ const LEARNING_RESOURCES: LearningResource[] = [
     verifiedBy: "Community moderators",
     image:
       "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2070&auto=format&fit=crop",
+    url: "https://www.themuse.com/advice/interview-questions-and-answers",
   },
 ];
 

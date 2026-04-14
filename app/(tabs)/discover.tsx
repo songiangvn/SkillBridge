@@ -107,7 +107,7 @@ export default function Discover() {
 
   const ResourceSection = () => {
     return (
-      <View style={{ gap: 8, paddingVertical: 16, paddingBottom: 32 }}>
+      <View style={{ gap: 8, paddingVertical: 16, paddingBottom: 100 }}>
         <View style={{ gap: 3 }}>
           <Text style={{ fontSize: 20, fontWeight: "900", color: "#111" }}>
             Verified resources

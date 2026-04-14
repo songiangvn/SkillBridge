@@ -64,7 +64,14 @@ export const useCatalogService = () => {
 
     appwriteAdapter.listResourceCatalog().then((catalogResources) => {
       if (isMounted && catalogResources && catalogResources.length > 0) {
-        setResources(catalogResources);
+        const fallbackById = new Map(
+          LEARNING_RESOURCES.map((r) => [r.id, r])
+        );
+        const merged = catalogResources.map((r) => ({
+          ...r,
+          url: r.url || fallbackById.get(r.id)?.url || "",
+        }));
+        setResources(merged);
       }
     });
 
