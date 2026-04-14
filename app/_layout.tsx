@@ -36,8 +36,9 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen
           name="(tabs)"
-          options={{ headerShown: false, title: "chats" }}
+          options={{ headerShown: false, title: "SkillBridge" }}
         />
+        <Stack.Screen name="chatScreen" options={{ headerShown: false }} />
         <Stack.Screen name="auth/signin" options={{ headerShown: false }} />
         <Stack.Screen name="auth/signup" options={{ headerShown: false }} />
         <Stack.Screen name="charscreenf" options={{ headerShown: true }} />

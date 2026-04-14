@@ -1,85 +1,124 @@
-# Humbble - The Open Source Dating App
+# SkillBridge
 
-Humbble is an open-source dating app alternative to Bumble. Our goal is to create a privacy-focused, feature-rich dating platform that is free from corporate control and empowers users with transparency and choice.
+SkillBridge is an Expo/React Native MVP for a two-way learning platform. It reuses the original Humbble dating-app structure and turns the swipe/match flow into a learning partner experience.
 
-<img src="https://github.com/user-attachments/assets/0b412b3f-df7b-4ddf-8739-21b3084fac3b" alt="Humbble Screenshot 1" width="900"></br>
-## 🚀 Features
+## MVP Scope
 
-- **Matchmaking Algorithm** – Smart and customizable matching system.
-- **Privacy First** – No tracking, no data selling.
-- **Real-Time Chat** – Secure messaging between matches.
-- **Open-Source** – Transparent and community-driven.
-- **Cross-Platform** – Available for Web, Android, and iOS.
+- **Learning partner matching**: swipe or press buttons to save bridge requests through the service layer.
+- **Mutual match chat**: when two real users bridge each other, the app creates a match thread and enables one-to-one messages.
+- **Tutor marketplace preview**: shortlist tutors and request a focused session.
+- **Global Q&A**: post questions, open a question, and add/remove answers through the service layer.
+- **Resource library preview**: save verified learning resources to the Saved tab.
+- **Profile editor**: edit role, teach/learn skills, availability, mode, level, location, credentials, hourly rate, and learning goal.
+- **Demo auth mode**: sign-in/sign-up routes work locally even before Appwrite is configured.
 
-## 💡 Why Humbble?
+## Architecture Phase
 
-Many dating apps prioritize profits over user experience and privacy. Humbble is different. By making the code open-source, we invite developers to contribute, improve, and ensure fairness in online dating.
+The UI talks to a service layer in `services/` instead of calling local storage directly from each screen. The service layer now has an Appwrite adapter and keeps browser-local storage as a fallback, so the app still runs before Docker/Appwrite are configured.
 
-## 📸 Screenshots
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/8e9c71be-0aaf-4874-90dc-22dd54557183" alt="Humbble Screenshot 1" width="200">
-  <img src="https://github.com/user-attachments/assets/d5d01e7b-dc27-450e-91e0-68f689d810a6" alt="Humbble Screenshot 2" width="200">
-  <img src="https://github.com/user-attachments/assets/e313c377-f4b0-4494-a116-e825cb37ef0d" alt="Humbble Screenshot 3" width="200">
-</p></br>
+## Recommended Local Workflow
 
-## 🔧 Getting Started
-
-### Prerequisites
-
-- Node.js & npm installed
-- React Native CLI for mobile development
-- Firebase or a backend of choice for authentication and database
-
-### Installation
+For the fastest MVP loop, run the web target first. It uses the same Expo/React Native codebase and is much quicker to inspect locally than native Android/iOS builds.
 
 ```sh
-git clone https://github.com/Prakashchandra-007/Humbble.git
-cd Humbble
+cd /home/sg/SkillBridge
 npm install
+npm run web
 ```
 
-### Running the Project
-
-For Web:
+You can also start the general Expo dev server:
 
 ```sh
 npm start
 ```
 
-For Android:
+After Expo starts:
+
+- Press `w` for web.
+- Scan the QR code with Expo Go for a device preview.
+- Press `a` for Android if an emulator is ready.
+- Press `i` for iOS if you are on macOS with the iOS simulator available.
+
+## Native Targets
+
+Android and iOS folders already exist, but they still carry some old native `humbble` naming from the source project. For this MVP, prefer web or Expo Go first. Do the deeper Gradle/Xcode package rename later, after the product direction is stable.
 
 ```sh
-npn run android
-```
-
-For iOS:
-
-```sh
+npm run android
 npm run ios
 ```
 
-## 👥 Contributing
+## Backend Notes
 
-We welcome all contributions! If you’d like to contribute:
+Appwrite config is environment-driven through `EXPO_PUBLIC_*` variables. The current recommended backend is Appwrite Cloud, because it works for both web localhost and the later Android/iOS phase without Docker/localhost networking issues.
 
-1. Fork the repository
-2. Create a new branch (`feature-new-feature`)
-3. Commit your changes (`git commit -m "Added new feature"`)
-4. Push to the branch (`git push origin feature-new-feature`)
-5. Create a Pull Request
+Copy the example env file when you are ready to configure a backend:
 
-Check our [CONTRIBUTING.md](https://github.com/Prakashchandra-007/humbble/blob/main/CONTRIBUTING.md) for more details.
+```sh
+cp .env.example .env
+```
 
-## 📜 License
+Then fill:
 
-Humbble is licensed under the MIT License. See [LICENSE](https://github.com/Prakashchandra-007/humbble/blob/main/LICENSE) for details.
+```env
+EXPO_PUBLIC_APPWRITE_ENDPOINT=https://fra.cloud.appwrite.io/v1
+EXPO_PUBLIC_APPWRITE_PROJECT_ID=your_project_id_here
+```
 
-## 📢 Community & Support
+The repo also includes a schema setup script:
 
-Join the discussion on:
+```sh
+npm run setup:appwrite
+```
 
-- [Discord](https://discord.gg/vGSWrzCF)
-- [Twitter](https://x.com/prakash_cm_007)
-- [GitHub Discussions](https://github.com/Prakashchandra-007/humbble/discussions)
+That script uses a temporary non-public `APPWRITE_API_KEY` from `.env` to create the database, collections, indexes, and seed catalog data. Revoke the key after setup. Full setup notes are in `docs/APPWRITE_SETUP.md`.
 
-Let's build a better dating experience together! ❤️
+## Demo Video Mode
+
+To generate startup-demo data with ready test users, pre-liked cards, instant matches, and seeded chat threads:
+
+```sh
+npm run seed:demo
+```
+
+`seed:demo` requires `.env` to contain:
+
+- `APPWRITE_API_KEY` with Database scopes and Users read/write scopes
+- `APPWRITE_DEMO_PASSWORD` (optional, defaults to `SkillBridge123!`)
+
+After seeding, use `demo.owner@skillbridge.app` as the main demo account and sign in from a second browser profile with any other demo account to simulate the second user in real time.
+
+## App Phase Activation
+
+For Android app testing from this same codebase:
+
+1. Keep Appwrite Cloud enabled in `.env` (do not use localhost endpoint for phone testing).
+2. In Appwrite Console, add mobile platforms for the package IDs currently in `app.json`.
+3. Start Expo and open on device:
+
+```sh
+npm start
+```
+
+Then press `a` for Android emulator or scan the QR code in Expo Go.
+
+If no project ID is configured, auth screens run in demo mode and the app falls back to browser-local storage.
+
+## Useful Files
+
+- `DB/userDB.tsx`: mock SkillBridge users and resources.
+- `components/PeopleCard.tsx`: core swipe matching card.
+- `components/UserCard.tsx`: discover/tutor/resource cards.
+- `services/`: app-facing service layer for auth, profile, bridge requests, tutors, Q&A answers, and resources.
+- `services/appwriteAdapter.ts`: Appwrite persistence adapter used when `.env` is configured.
+- `services/catalogService.ts`: profile/resource catalog source with Appwrite-first, mock-data fallback behavior.
+- `services/matchService.ts`: mutual-match thread and message service with local fallback.
+- `utils/storage.ts`: browser-local MVP persistence helpers.
+- `docs/APPWRITE_SETUP.md`: Appwrite Cloud/backend setup guide.
+- `scripts/seed-appwrite-demo.mjs`: creates demo accounts and seeded product scenarios for recording.
+- `app/(tabs)/people.tsx`: main SkillBridge tab.
+- `app/(tabs)/discover.tsx`: partners, tutors, and resources.
+- `app/(tabs)/index.tsx`: saved bridge requests, tutor shortlist, and resources.
+- `app/(tabs)/(chats)/index.tsx`: Q&A feed.
+- `app/(tabs)/profile.tsx`: learning profile MVP.
+- `SKILLBRIDGE_REPO_NOTES.md`: exploration notes and conversion guide.

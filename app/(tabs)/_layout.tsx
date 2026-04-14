@@ -1,5 +1,5 @@
-import { Redirect, Tabs, useRouter, useSegments } from "expo-router";
-import React, { useEffect } from "react";
+import { Tabs } from "expo-router";
+import React from "react";
 import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
@@ -9,7 +9,6 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   FontAwesome,
-  FontAwesome6,
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
@@ -66,7 +65,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="people"
           options={{
-            title: "People",
+            title: "Bridge",
             tabBarIcon: ({ color }) => (
               <IconSymbol size={28} name="person.3.fill" color={color} />
             ),
@@ -75,27 +74,18 @@ export default function TabLayout() {
         <Tabs.Screen
           name="(chats)"
           options={{
-            title: "Chats",
+            title: "Q&A",
             tabBarIcon: ({ color }) => (
               <Ionicons name="chatbubble" size={24} color={color} />
             ),
           }}
         />
-        {/* <Tabs.Screen
-          name="likedYou"
-          options={{
-            title: "liked You",
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={"heart"} size={24} color={color} />
-            ),
-          }}
-        /> */}
         <Tabs.Screen
           name="index"
           options={{
-            title: "liked You",
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={"heart"} size={24} color={color} />
+            title: "Chat",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="chatbubble-ellipses" size={24} color={color} />
             ),
           }}
         />

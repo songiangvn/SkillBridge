@@ -1,242 +1,397 @@
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import React from "react";
 import Header from "@/components/Header";
-import { AntDesign, Ionicons, Octicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import Avatar from "@/components/Avatar";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
+import { ProfileDraft, useProfileService } from "@/services/profileService";
+import { signOut } from "@/services/authService";
 
-const PLANS = [
-  { plan: "Get exclusive photo insights", p1: true, p2: true },
-  { plan: "Fast track your likes", p1: true, p2: true },
-  { plan: "Standout every day", p1: true, p2: true },
-  { plan: "Unlimited likes", p1: true, p2: false },
-  { plan: "See who liked you", p1: true, p2: false },
-  { plan: "Advanced filters", p1: true, p2: false },
-  { plan: "Incognito mode", p1: true, p2: false },
-  { plan: "Two compliments a weeks", p1: true, p2: true },
-];
-
-const profile = () => {
+const Profile = () => {
   const headerbutton = () => (
     <AntDesign name="setting" size={24} color="black" />
   );
   const router = useRouter();
-  return (
-    <ScrollView style={{ paddingHorizontal: 8 }}>
-      <View style={{ gap: 10 }}>
-        <Header headerTitle={"Profile"} button={headerbutton} />
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <Avatar
-            size={80}
-            image="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-          />
-          <View>
-            <Text style={{ fontSize: 22, fontWeight: "600" }}>Prakash, 27</Text>
-            <Button
-              style={{ backgroundColor: "#ebebeb" }}
-              textStyle={{ color: "#1c1c1c" }}
-              onPress={() => router.replace("/auth/signin")}
-            >
-              Complete profile
-            </Button>
-          </View>
-        </View>
-        <View
-          style={{ flexDirection: "row", gap: 10, justifyContent: "center" }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 5,
-              flex: 1,
-              borderWidth: 1,
-              paddingHorizontal: 3,
-              paddingVertical: 10,
-              borderRadius: 12,
-              borderColor: "#f0eded",
-            }}
-          >
-            <View style={styles.circle}>
-              <AntDesign name="star" size={24} color="black" />
-            </View>
-            <View style={{ flexDirection: "column" }}>
-              <Text style={{ fontWeight: "800", color: "white" }}>Spotlight</Text>
-              <Text>Stand out</Text>
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 5,
-              flex: 1,
-              borderWidth: 1,
-              paddingHorizontal: 3,
-              paddingVertical: 10,
-              borderRadius: 12,
-              borderColor: "#f0eded",
-            }}
-          >
-            <View style={styles.circle}>
-              <AntDesign name="star" size={24} color="black" />
-            </View>
-            <View style={{ flexDirection: "column" }}>
-              <Text style={{ fontWeight: "800", color: "white" }}>Spotlight</Text>
-              <Text>Stand out</Text>
-            </View>
-          </View>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View
-            style={{
-              backgroundColor: "#ffa600",
-              height: 160,
-              width: 300,
-              borderRadius: 20,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: 20,
-              gap: 10,
-              marginRight: 5,
-            }}
-          >
-            <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-              Premium+
-            </Text>
-            <Text style={{ fontWeight: "300", textAlign: "center" }}>
-              Get the VIP teatment, and enjoy better ways to connect with
-              incredible people
-            </Text>
-            <Button
-              style={{ backgroundColor: "#1c1c1c" }}
-              textStyle={{ color: "#ebebeb" }}
-              onPress={() => router.replace("/auth/signin")}
+  const { profile, profileStrength, updateProfile } = useProfileService();
+  const [isSigningOut, setIsSigningOut] = React.useState(false);
 
-            >
-              Complete profile
-            </Button>
-          </View>
-          <View
-            style={{
-              backgroundColor: "#ffa600",
-              height: 160,
-              width: 300,
-              borderRadius: 20,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: 20,
-              gap: 10,
-            }}
-          >
-            <Text style={{ fontWeight: "bold", textAlign: "center" }}>
-              Premium+
+  const profileSteps = [
+    { label: "Choose learner/tutor role", done: Boolean(profile.role.trim()) },
+    { label: "Add skills you can teach", done: Boolean(profile.canTeach.trim()) },
+    {
+      label: "Add skills you want to learn",
+      done: Boolean(profile.wantsToLearn.trim()),
+    },
+    {
+      label: "Set weekly availability",
+      done: Boolean(profile.availability.trim()),
+    },
+    { label: "Choose learning mode", done: Boolean(profile.mode.trim()) },
+    { label: "Set current level", done: Boolean(profile.level.trim()) },
+    { label: "Write a learning goal", done: Boolean(profile.goal.trim()) },
+  ];
+  const roleOptions: ProfileDraft["role"][] = ["Learner", "Tutor", "Both"];
+  const modeOptions: ProfileDraft["mode"][] = ["Online", "In person", "Hybrid"];
+  const levelOptions: ProfileDraft["level"][] = [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+  ];
+
+  return (
+    <ScrollView style={{ paddingHorizontal: 12, backgroundColor: "#fff" }}>
+      <View style={{ gap: 16, paddingBottom: 32 }}>
+        <Header headerTitle={"Profile"} button={headerbutton} />
+        <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
+          <Avatar
+            size={82}
+            image="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop"
+          />
+          <View style={{ flex: 1, gap: 6 }}>
+            <Text style={{ fontSize: 24, fontWeight: "900", color: "#111" }}>
+              {profile.name || "SkillBridge Learner"}
             </Text>
-            <Text style={{ fontWeight: "300", textAlign: "center" }}>
-              Get the VIP teatment, and enjoy better ways to connect with
-              incredible people
+            <Text style={{ color: "#555", lineHeight: 20 }}>
+              {profile.goal || "Add a learning goal to improve matches."}
             </Text>
-            <Button
-              style={{ backgroundColor: "#1c1c1c" }}
-              textStyle={{ color: "#ebebeb" }}
-              onPress={() => router.replace("/auth/signin")}
-            >
-              Complete profile
-            </Button>
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <Button
+                style={{ backgroundColor: "#111", alignSelf: "flex-start" }}
+                textStyle={{ color: "#fff" }}
+                borderRadius={8}
+                paddingHorizontal={12}
+                paddingVertical={9}
+                onPress={() => router.replace("/auth/signin")}
+              >
+                Switch account
+              </Button>
+              <Button
+                style={{ backgroundColor: "#e5e5e5", alignSelf: "flex-start" }}
+                textStyle={{ color: "#111" }}
+                borderRadius={8}
+                paddingHorizontal={12}
+                paddingVertical={9}
+                disabled={isSigningOut}
+                onPress={async () => {
+                  setIsSigningOut(true);
+                  await signOut();
+                  setIsSigningOut(false);
+                  router.replace("/auth/signin");
+                }}
+              >
+                {isSigningOut ? "Signing out..." : "Sign out"}
+              </Button>
+            </View>
           </View>
-        </ScrollView>
-        <View style={styles.table}>
-          <View style={styles.tableItem}>
-            <Text style={[styles.row1, { fontWeight: "bold" }]}>
-              What you get:
-            </Text>
-            <Text style={[styles.row2, { fontWeight: "bold" }]}>Premium+</Text>
-            <Text style={[styles.row3, { fontWeight: "bold" }]}>Premium</Text>
-          </View>
-          {PLANS.map((planitem) => {
-            return (
-              <View style={styles.tableItem} key={planitem.plan}>
-                <Text style={[styles.row1, { fontWeight: "300", color:"white" }]}>
-                  {planitem.plan}
+        </View>
+
+        <View style={styles.heroCard}>
+          <Text style={styles.heroTitle}>Learning profile strength</Text>
+          <Text style={styles.heroScore}>{profileStrength}%</Text>
+          <Text style={styles.heroText}>
+            Complete your skills, availability, and goal to improve match
+            quality.
+          </Text>
+        </View>
+
+        <View style={styles.formCard}>
+          <Text style={styles.sectionTitle}>Edit learning profile</Text>
+          <TextInput
+            style={styles.input}
+            value={profile.name}
+            onChangeText={(value) => updateProfile("name", value)}
+            placeholder="Display name"
+            placeholderTextColor="#777"
+          />
+          <Text style={styles.fieldLabel}>Role</Text>
+          <View style={styles.choiceRow}>
+            {roleOptions.map((role) => (
+              <Pressable
+                key={role}
+                onPress={() => updateProfile("role", role)}
+                style={[
+                  styles.choiceChip,
+                  profile.role === role && styles.choiceChipActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.choiceText,
+                    profile.role === role && styles.choiceTextActive,
+                  ]}
+                >
+                  {role}
                 </Text>
+              </Pressable>
+            ))}
+          </View>
+          <TextInput
+            style={styles.input}
+            value={profile.canTeach}
+            onChangeText={(value) => updateProfile("canTeach", value)}
+            placeholder="Skills you can teach"
+            placeholderTextColor="#777"
+          />
+          <TextInput
+            style={styles.input}
+            value={profile.wantsToLearn}
+            onChangeText={(value) => updateProfile("wantsToLearn", value)}
+            placeholder="Skills you want to learn"
+            placeholderTextColor="#777"
+          />
+          <TextInput
+            style={styles.input}
+            value={profile.availability}
+            onChangeText={(value) => updateProfile("availability", value)}
+            placeholder="Weekly availability"
+            placeholderTextColor="#777"
+          />
+          <Text style={styles.fieldLabel}>Learning mode</Text>
+          <View style={styles.choiceRow}>
+            {modeOptions.map((mode) => (
+              <Pressable
+                key={mode}
+                onPress={() => updateProfile("mode", mode)}
+                style={[
+                  styles.choiceChip,
+                  profile.mode === mode && styles.choiceChipActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.choiceText,
+                    profile.mode === mode && styles.choiceTextActive,
+                  ]}
+                >
+                  {mode}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <Text style={styles.fieldLabel}>Current level</Text>
+          <View style={styles.choiceRow}>
+            {levelOptions.map((level) => (
+              <Pressable
+                key={level}
+                onPress={() => updateProfile("level", level)}
+                style={[
+                  styles.choiceChip,
+                  profile.level === level && styles.choiceChipActive,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.choiceText,
+                    profile.level === level && styles.choiceTextActive,
+                  ]}
+                >
+                  {level}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+          <TextInput
+            style={styles.input}
+            value={profile.location}
+            onChangeText={(value) => updateProfile("location", value)}
+            placeholder="Location or timezone"
+            placeholderTextColor="#777"
+          />
+          <TextInput
+            style={styles.input}
+            value={profile.credentials}
+            onChangeText={(value) => updateProfile("credentials", value)}
+            placeholder="Credentials, proof, or teaching experience"
+            placeholderTextColor="#777"
+          />
+          <TextInput
+            style={styles.input}
+            value={profile.hourlyRate}
+            onChangeText={(value) => updateProfile("hourlyRate", value)}
+            placeholder="Tutor hourly rate (optional)"
+            placeholderTextColor="#777"
+          />
+          <TextInput
+            style={[styles.input, styles.goalInput]}
+            value={profile.goal}
+            onChangeText={(value) => updateProfile("goal", value)}
+            placeholder="Learning goal"
+            placeholderTextColor="#777"
+            multiline
+          />
+        </View>
+
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Role</Text>
+            <Text style={styles.statValue}>{profile.role}</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Can teach</Text>
+            <Text style={styles.statValue}>
+              {profile.canTeach || "Add a skill"}
+            </Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Learning</Text>
+            <Text style={styles.statValue}>
+              {profile.wantsToLearn || "Add a goal skill"}
+            </Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Availability</Text>
+            <Text style={styles.statValue}>
+              {profile.availability || "Not set yet"}
+            </Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Mode / level</Text>
+            <Text style={styles.statValue}>
+              {profile.mode} | {profile.level}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.table}>
+          <Text style={styles.sectionTitle}>MVP checklist</Text>
+          {profileSteps.map((step) => {
+            return (
+              <View style={styles.tableItem} key={step.label}>
+                <Text style={styles.stepLabel}>{step.label}</Text>
                 <Ionicons
-                  style={styles.row2}
-                  name="checkmark-outline"
+                  name={step.done ? "checkmark-circle" : "ellipse-outline"}
                   size={24}
-                  color={planitem.p1 ? "black" : "#bdb9b9"}
-                />
-                <Ionicons
-                  style={styles.row3}
-                  name="checkmark-outline"
-                  size={24}
-                  color={planitem.p2 ? "black" : "#bdb9b9"}
+                  color={step.done ? "#111" : "#bdb9b9"}
                 />
               </View>
             );
           })}
-          <View style={styles.tableItem}>
-            <Text style={[styles.row1, { fontWeight: "400" }]}>
-              What you get:
-            </Text>
-            <Ionicons
-              style={styles.row2}
-              name="checkmark-outline"
-              size={24}
-              color="black"
-            />
-            <Ionicons
-              style={styles.row3}
-              name="checkmark-outline"
-              size={24}
-              color="black"
-            />
-          </View>
         </View>
       </View>
     </ScrollView>
   );
 };
 
-export default profile;
+export default Profile;
 
 const styles = StyleSheet.create({
+  heroCard: {
+    backgroundColor: "#FFD600",
+    borderRadius: 8,
+    padding: 18,
+    gap: 6,
+  },
+  heroTitle: {
+    color: "#111",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+  heroScore: {
+    color: "#111",
+    fontSize: 42,
+    fontWeight: "900",
+  },
+  heroText: {
+    color: "#333",
+    lineHeight: 20,
+  },
+  formCard: {
+    backgroundColor: "#f7f7f7",
+    borderRadius: 8,
+    padding: 14,
+    gap: 10,
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    color: "#111",
+  },
+  fieldLabel: {
+    color: "#333",
+    fontSize: 13,
+    fontWeight: "900",
+    marginTop: 2,
+  },
+  choiceRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  choiceChip: {
+    backgroundColor: "#fff",
+    borderColor: "#ddd",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  choiceChipActive: {
+    backgroundColor: "#111",
+    borderColor: "#111",
+  },
+  choiceText: {
+    color: "#333",
+    fontWeight: "800",
+  },
+  choiceTextActive: {
+    color: "#fff",
+  },
+  goalInput: {
+    minHeight: 88,
+    textAlignVertical: "top",
+  },
+  statsGrid: {
+    gap: 10,
+  },
+  statCard: {
+    backgroundColor: "#f7f7f7",
+    borderRadius: 8,
+    padding: 14,
+    gap: 4,
+  },
+  statLabel: {
+    color: "#666",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    fontSize: 12,
+  },
+  statValue: {
+    color: "#111",
+    fontSize: 16,
+    fontWeight: "900",
+  },
+  sectionTitle: {
+    color: "#111",
+    fontSize: 18,
+    fontWeight: "900",
+  },
   tableItem: {
     flexDirection: "row",
-    paddingHorizontal: 5,
-    borderBottomWidth: 2,
-    paddingVertical: 5,
-    borderStyle: "solid",
-    borderRadius: 1,
-    borderColor: "#f0eded",
-  },
-  row1: { width: "40%" },
-  row2: {
-    width: "30%",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
+    backgroundColor: "#f7f7f7",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 8,
   },
-  row3: {
-    width: "30%",
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
+  stepLabel: {
+    color: "#111",
+    fontSize: 15,
+    fontWeight: "700",
+    flex: 1,
   },
   table: {
     width: "100%",
-    gap: 4,
-  },
-  circle: {
-    borderRadius: 40,
-    height: 40,
-    width: 40,
-    backgroundColor: "#ffa600",
-    justifyContent: "center",
-    alignItems: "center",
+    gap: 10,
   },
 });

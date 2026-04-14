@@ -1,161 +1,116 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  StyleSheet, 
-  Alert, 
-  TouchableOpacity, 
-  ImageBackground,
-  Dimensions,
+import { signUp } from "@/services/authService";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import appwrite from '../../constants/appwrite';
-
-const { width, height } = Dimensions.get('window');
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 const SignupScreen = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSignup = async () => {
     setLoading(true);
     try {
-      await appwrite?.account?.create(
-        'unique()',
-        email,
-        password,
-        name
-      );
-      Alert.alert('Success', 'Account created! Please sign in.');
-      setEmail('');
-      setPassword('');
-      setName('');
-      router.replace('/auth/signin');
+      const result = await signUp({ name, email, password });
+      Alert.alert("Success", result.message);
+      setEmail("");
+      setPassword("");
+      setName("");
+      router.replace("/profile");
     } catch (error: any) {
-      Alert.alert('Signup Error', error.message || 'Unknown error');
+      Alert.alert("Signup Error", error.message || "Unknown error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <LinearGradient
-        colors={['#FFD600', '#FFD600', '#1a1a1a']}
-        style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        
-        <ImageBackground
-          source={require('../../assets/images/sign-up.jpg')} 
-          style={styles.backgroundImage}
-          imageStyle={styles.backgroundImageStyle}
-        >
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {/* Header Section */}
-            <View style={styles.headerSection}>
-              <Text style={styles.welcomeText}>Join Us Today</Text>
-              <Text style={styles.subtitle}>Create your account and start exploring</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.shell}>
+          <View style={styles.brandMark}>
+            <Ionicons name="school" size={40} color="#111" />
+          </View>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>
+            Build a learning profile for skill swaps, tutors, and Q&A.
+          </Text>
+
+          <View style={styles.form}>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your name"
+                placeholderTextColor="#aaa"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+              />
             </View>
 
-            {/* Form Section */}
-            <View style={styles.formContainer}>
-              <Text style={styles.formTitle}>SIGN UP</Text>
-              
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Full Name"
-                  placeholderTextColor="#999"
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Email"
-                  placeholderTextColor="#999"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-
-              <View style={styles.inputContainer}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Password"
-                  placeholderTextColor="#999"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                />
-              </View>
-
-              <TouchableOpacity 
-                style={[styles.signupButton, loading && styles.signupButtonDisabled]} 
-                onPress={handleSignup}
-                disabled={loading}
-              >
-                <View style={styles.signupButtonSolid}>
-                  <Text style={styles.signupButtonTextSolid}>
-                    {loading ? 'Creating Account...' : 'Sign Up'}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-
-              <View style={styles.dividerContainer}>
-                <View style={styles.divider} />
-                <Text style={styles.dividerText}>Or sign up with</Text>
-                <View style={styles.divider} />
-              </View>
-
-              <View style={styles.socialContainer}>
-                <TouchableOpacity style={styles.socialButton}>
-                  <Text style={styles.socialButtonText}>G</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.socialButton}>
-                  <Text style={styles.socialButtonText}>f</Text>
-                </TouchableOpacity>
-              </View>
-
-              <TouchableOpacity 
-                onPress={() => router.replace('/auth/signin')} 
-                style={styles.linkContainer}
-              >
-                <Text style={styles.linkText}>
-                  Already have an account? <Text style={styles.linkHighlight}>Sign In</Text>
-                </Text>
-              </TouchableOpacity>
-
-              <View style={styles.termsContainer}>
-                <Text style={styles.termsText}>
-                  By signing up, you agree to our{' '}
-                  <Text style={styles.termsLink}>Terms of Service</Text>
-                  {' '}and{' '}
-                  <Text style={styles.termsLink}>Privacy Policy</Text>
-                </Text>
-              </View>
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your email"
+                placeholderTextColor="#aaa"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
             </View>
-          </ScrollView>
-        </ImageBackground>
-      </LinearGradient>
+
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter your password"
+                placeholderTextColor="#aaa"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+            </View>
+
+            <Pressable
+              style={[styles.primaryButton, loading && styles.disabledButton]}
+              onPress={handleSignup}
+              disabled={loading}
+            >
+              <Text style={styles.primaryButtonText}>
+                {loading ? "Creating account..." : "Sign Up"}
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => router.replace("/auth/signin")}
+              style={styles.switchLink}
+            >
+              <Text style={styles.switchText}>
+                Already learning here? <Text style={styles.switchTextStrong}>Login</Text>
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
@@ -163,165 +118,94 @@ const SignupScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-  },
-  backgroundImage: {
-    flex: 1,
-  },
-  backgroundImageStyle: {
-    opacity: 0.3,
+    backgroundColor: "#fff",
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'space-between',
-    minHeight: height,
+    justifyContent: "center",
+    padding: 24,
   },
-  headerSection: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
+  shell: {
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+    gap: 14,
   },
-  welcomeText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 8,
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+  brandMark: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "#FFD600",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 6,
+  },
+  title: {
+    color: "#111",
+    fontSize: 28,
+    fontWeight: "900",
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.3)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3,
+    color: "#666",
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: "center",
+    marginBottom: 14,
   },
-  formContainer: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    padding: 30,
-    paddingBottom: 50,
-    minHeight: height * 0.65,
+  form: {
+    gap: 18,
   },
-  formTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
-    color: '#333',
-    letterSpacing: 1,
+  fieldGroup: {
+    gap: 8,
   },
-  inputContainer: {
-    marginBottom: 20,
+  label: {
+    color: "#333",
+    fontSize: 14,
+    fontWeight: "800",
   },
   input: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#333',
+    backgroundColor: "#fff",
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e9ecef',
-  },
-  signupButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    marginBottom: 20,
-  },
-  signupButtonDisabled: {
-    elevation: 0,
-    shadowOpacity: 0,
-  },
-  signupButtonSolid: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFD600',
-    borderRadius: 12,
-  },
-  signupButtonTextSolid: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#e9ecef',
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    color: '#6c757d',
-    fontSize: 14,
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginBottom: 20,
-  },
-  socialButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#FFD600',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#1a1a1a',
-    
-    
-  },
-  socialButtonText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1a1a1a',
-  },
-  linkContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  linkText: {
-    color: '#6c757d', 
+    borderColor: "#ddd",
+    paddingHorizontal: 16,
+    paddingVertical: 15,
     fontSize: 16,
+    color: "#111",
   },
-  linkHighlight: {
-    color: '#FFD600',
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-    
+  primaryButton: {
+    height: 54,
+    borderRadius: 8,
+    backgroundColor: "#111",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 4,
   },
-  termsContainer: {
-    paddingHorizontal: 10,
+  disabledButton: {
+    opacity: 0.6,
   },
-  termsText: {
-    fontSize: 12,
-    color: '#6c757d', 
-    textAlign: 'center',
-    lineHeight: 18,
+  primaryButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "900",
   },
-  termsLink: {
-    color: '#FFD600', 
-    fontWeight: '500',  
+  switchLink: {
+    alignItems: "center",
+    paddingTop: 4,
+  },
+  switchText: {
+    color: "#666",
+    fontSize: 15,
+  },
+  switchTextStrong: {
+    color: "#8a6a00",
+    fontWeight: "900",
   },
 });
 

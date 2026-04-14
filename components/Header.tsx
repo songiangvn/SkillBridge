@@ -1,9 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { ReactDOM } from "react";
-import { Octicons } from "@expo/vector-icons";
+import React from "react";
 interface HeaderProp {
-  headerTitle: any;
-  button: any;
+  headerTitle: string;
+  button: () => React.ReactNode;
 }
 const Header = ({ headerTitle, button }: HeaderProp) => {
   return (
@@ -22,12 +21,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 8,
     marginBottom: 6,
-
   },
   logo: {
-    color: "white",
+    color: "#111",
     fontSize: 24,
-    fontWeight: "bold",
-    letterSpacing: 1,
+    fontWeight: "900",
   },
 });
